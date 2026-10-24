@@ -419,18 +419,18 @@ static void USER_FUNC mqttcli_thread(void* client)
 
 
 
-void USER_FUNC mqttcli_publish(char *value, char *sufix)
+int USER_FUNC mqttcli_publish(char *value, char *sufix, uint8_t retain)
 {
 	struct hfeasy_state *state = config_get_state();
 	char *topic;
 	uint8_t flags;
-	
+
 	topic = hfmem_malloc(100);
 	if (topic == NULL) {
 		u_printf("publish: no mem\r\n");
-		return;
+		return -1;
 	}
-		
+
 	switch (state->cfg.mqtt_qos) {
 		default:
 		case 0:
@@ -443,15 +443,19 @@ void USER_FUNC mqttcli_publish(char *value, char *sufix)
 			flags = MQTT_PUBLISH_QOS_2;
 			break;
 	}
-	
+
+	if (state->cfg.mqtt_retain || retain) {
+		flags |= MQTT_PUBLISH_RETAIN;
+	}
+
 	if (state->mqtt_ready) {
 		mqttcli_get_topic(topic, "stat", sufix);
 		hfeasy_mqtt_publish(&mqttcli, topic, value, strlen(value), flags);
 		leds_ctrl_if(LED_CONFIG_MQTT, "n1f1n1f", NULL); /* publish = 2 blinks */
 	}
 	hfmem_free(topic);
+	return state->mqtt_ready ? 0 : -1;
 }
-
 
 void USER_FUNC mqttcli_initcfg(void)
 {
@@ -459,6 +463,8 @@ void USER_FUNC mqttcli_initcfg(void)
 
 	sprintf(state->cfg.mqtt_topic, "hfeasy_%s", &state->mac_addr_s[6]);
 	sprintf(state->cfg.mqtt_full_topic, "%%prefix%%/%%topic%%/");
+	state->cfg.mqtt_qos = 0;
+	state->cfg.mqtt_retain = 0; /* default to no retain */
 	sprintf(state->cfg.mqtt_on_value, "ON");
 	sprintf(state->cfg.mqtt_off_value, "OFF");
 }

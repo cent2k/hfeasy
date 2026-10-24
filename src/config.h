@@ -38,6 +38,7 @@ struct hfeasy_config {
 	char      mqtt_topic[30];
 	char      mqtt_full_topic[50];
 	uint8_t   mqtt_qos;
+	uint8_t   mqtt_retain;
 	char      mqtt_on_value[10];
 	char      mqtt_off_value[10];
 	

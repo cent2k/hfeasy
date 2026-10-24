@@ -396,6 +396,7 @@ static const char *config_page_mqtt =
 	"<TR><TD>QOS<TD><input type=\"text\" name=\"qos\" value=\"%d\">"\
 	"<TR><TD>ON value<TD><input type=\"text\" name=\"on_val\" value=\"%s\">"\
 	"<TR><TD>OFF value<TD><input type=\"text\" name=\"off_val\" value=\"%s\">"\
+	"<TR><TD>Retain message<TD><input type=\"checkbox\" name=\"retain\" value=\"1\" %s>"\
 	"</table><input type=\"submit\" value=\"Apply\"></form>"\
 	"</body></html>";
 
@@ -407,14 +408,14 @@ static void USER_FUNC httpd_page_config_mqtt(char *url, char *rsp)
 	ret = httpd_arg_find(url, "host", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_server_hostname, tmp);
-	
+
 	ret = httpd_arg_find(url, "port", tmp);
 	if (ret > 0) {
 		state.cfg.mqtt_server_port = atoi(tmp);
 		if (state.cfg.mqtt_server_port == 0)
 			state.mqtt_ready = 0;
 	}
-	
+
 	ret = httpd_arg_find(url, "user", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_server_user, tmp);
@@ -426,7 +427,7 @@ static void USER_FUNC httpd_page_config_mqtt(char *url, char *rsp)
 	ret = httpd_arg_find(url, "topic", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_topic, tmp);
-		
+
 	ret = httpd_arg_find(url, "full_topic", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_full_topic, tmp);
@@ -434,7 +435,11 @@ static void USER_FUNC httpd_page_config_mqtt(char *url, char *rsp)
 	ret = httpd_arg_find(url, "qos", tmp);
 	if (ret > 0)
 		state.cfg.mqtt_qos = atoi(tmp);
-	
+
+	ret = httpd_arg_find(url, "retain", tmp);
+	if (ret > 0)
+		state.cfg.mqtt_retain = atoi(tmp);
+
 	ret = httpd_arg_find(url, "on_val", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_on_value, tmp);
@@ -442,16 +447,16 @@ static void USER_FUNC httpd_page_config_mqtt(char *url, char *rsp)
 	ret = httpd_arg_find(url, "off_val", tmp);
 	if (ret > 0)
 		strcpy(state.cfg.mqtt_off_value, tmp);
-	
+
 	sprintf(rsp, config_page_mqtt, HFEASY_VERSION_MAJOR, HFEASY_VERSION_MINOR,
 					state.cfg.mqtt_server_hostname, state.cfg.mqtt_server_port,
 					state.cfg.mqtt_server_user, state.cfg.mqtt_server_pass,
 					state.cfg.mqtt_topic, state.cfg.mqtt_full_topic, state.cfg.mqtt_qos,
-					state.cfg.mqtt_on_value, state.cfg.mqtt_off_value);
+					state.cfg.mqtt_on_value, state.cfg.mqtt_off_value,
+					state.cfg.mqtt_retain ? "checked" : "");
 
 	u_printf("page_size=%d\r\n", strlen(rsp));
 }
-
 static const char *config_page_gpio =
 	"<!DOCTYPE html><html><head><title>HFeasy v%d.%d</title><link rel=\"stylesheet\" href=\"styles.css\"></head><body>"\
 	"<h1>HFeasy GPIO config</h1><hr>"\
