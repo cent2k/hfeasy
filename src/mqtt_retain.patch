@@ -1,0 +1,2 @@
+# Patch for header conflicts - add to CFLAGS before SDK include
+# Use -isystem flags or symlink headers

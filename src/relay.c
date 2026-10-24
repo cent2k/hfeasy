@@ -5,7 +5,7 @@ void USER_FUNC relay_publish_state(void)
 {
 	struct hfeasy_state *state = config_get_state();
 	char *val = state->relay_state ? state->cfg.mqtt_on_value : state->cfg.mqtt_off_value;
-	mqttcli_publish(val, "POWER");
+	mqttcli_publish(val, "POWER", state->cfg.mqtt_retain);
 }
 
 

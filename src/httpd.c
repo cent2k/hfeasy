@@ -1,5 +1,7 @@
-//#include <unistd.h>
 #include "hfeasy.h"
+
+/* Provide read prototype to avoid implicit declaration warning/error */
+extern ssize_t read(int __fd, void *__buf, size_t __n);
 
 #define HTTP_SERVER_PORT	8080
 #define HTTPD_MAX_PAGES		20

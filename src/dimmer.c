@@ -37,10 +37,10 @@ void USER_FUNC dimmer_publish_state(int on_off)
 	
 	if (on_off) {
 		val = state->relay_state ? state->cfg.mqtt_on_value : state->cfg.mqtt_off_value;
-		mqttcli_publish(val, "POWER");
+		mqttcli_publish(val, "POWER", state->cfg.mqtt_retain);
 	} else {
 		sprintf(buf, "%d", state->dimmer_level);
-		mqttcli_publish(buf, "dimmer");
+		mqttcli_publish(buf, "dimmer", state->cfg.mqtt_retain);
 	}
 }
 
